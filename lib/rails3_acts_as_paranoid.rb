@@ -19,7 +19,7 @@ module ActsAsParanoid
 
       class << self
         def with_deleted
-          self.unscoped.where() # ugly, but it re-fetches the data (no caching)
+          self.unscoped
         end
 
         def only_deleted
