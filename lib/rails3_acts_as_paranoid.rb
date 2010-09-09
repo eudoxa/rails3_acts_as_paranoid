@@ -35,17 +35,22 @@ module ActsAsParanoid
         def delete_all(conditions = nil)
           update_all ["#{configuration[:column]} = ?", #{type}], conditions
         end
-      end
 
-      def destroy!
-        #{self.name}.delete_all!(:id => self)
-      end
-      
-      def destroy
-        if self.#{configuration[:column]} == nil
-          #{self.name}.delete_all(:id => self)
-        else
-          #{self.name}.delete_all!(:id => self)
+        def destroy!
+          self.deleted_at = #{type}
+          self.save(:validate => false)
+        end
+
+        def destroy
+          if self.#{configuration[:column]} == nil
+            return true if self.deleted_at
+            self.deleted_at = #{type}
+            self.save(:validate => false)
+          else
+            self.deleted_at = #{type}
+            self.save(:validate => false)
+          end
+          return true
         end
       end
 
@@ -63,3 +68,4 @@ end
 
 # Extend ActiveRecord's functionality
 ActiveRecord::Base.extend ActsAsParanoid
+
